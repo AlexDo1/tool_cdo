@@ -1,25 +1,24 @@
 tools:
-  foobar:
-    title: Foo Bar
-    description: A dummy tool to exemplify the YAML file
+  sellonlatbox:
+    title: Select grid cells from a netCDF file.
+    description: |
+      Selects grid cells inside a lon/lat box. The user must specify the longitude 
+      and latitude of the edges of the box. Only those grid cells are considered 
+      whose grid center lies within the lon/lat box. 
     version: 0.1
     parameters:
-      foo_int: 
-        type: integer
-      foo_float:
+      infile: 
+        type: file
+        description: Input netCDF file which is sliced.
+      min_lon:
         type: float
-      foo_string:
-        type: string
-      foo_enum:
-        type: enum
-        values:
-          - foo
-          - bar
-          - baz
-      foo_array:
-        type: integer
-        array: true
-      foo_matrix:
-        type: file
-      foo_csv:
-        type: file
+        description: Western longitude in degrees
+      max_lon:
+        type: float
+        description: Eastern longitude in degrees
+      min_lat:
+        type: float
+        description: Southern or northern latitude in degrees
+      max_lat:
+        type: float
+        description: Northern or southern latitude in degrees
