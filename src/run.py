@@ -1,8 +1,8 @@
 import os
 from datetime import datetime as dt
-import subprocess
-from pprint import pprint
 
+from cdo import *
+from cdolib import *
 from json2args import get_parameter
 
 # parse parameters
@@ -13,9 +13,17 @@ toolname = os.environ.get('TOOL_RUN', 'sellonlatbox').lower()
 
 # switch the tool
 if toolname == 'sellonlatbox':
-    print(kwargs)
+    # get the parameters
+    try:
+        infile = kwargs['infile']
+        min_lon, max_lon, min_lat, max_lat = kwargs['min_lon'], kwargs['max_lon'], kwargs['min_lat'], kwargs['max_lat']
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
+
     # run the command
-    subprocess.Popen(f"cdo sellonlatbox,{kwargs['min_lon']},{kwargs['max_lon']},{kwargs['min_lat']},{kwargs['max_lat']} {kwargs['infile']} /out/outfile.nc")
+    sellonlatbox(min_lon, max_lon, min_lat, max_lat, infile)
+    
 
 # In any other case, it was not clear which tool to run
 else:
