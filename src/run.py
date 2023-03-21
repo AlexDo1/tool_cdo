@@ -23,7 +23,18 @@ if toolname == 'sellonlatbox':
 
     # run the command
     sellonlatbox(min_lon, max_lon, min_lat, max_lat, infile)
-    
+
+elif toolname == 'seldate':
+    # get the parameters
+    try:
+        infile = kwargs['infile']
+        startdate, enddate = kwargs['startdate'], kwargs['enddate']
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
+
+    # run the command
+    seldate(startdate, enddate, infile)    
 
 # In any other case, it was not clear which tool to run
 else:

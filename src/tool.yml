@@ -22,3 +22,17 @@ tools:
       max_lat:
         type: float
         description: Northern or southern latitude in degrees
+  seldate:
+    title: Select dates
+    description: Selects all timesteps with a date in a user given range.
+    version: 0.1
+    parameters:
+      infile:
+        type: file
+        description: Input netCDF file which is sliced.
+      startdate:
+        type: string
+        description: Start date (format YYYY-MM-DDThh:mm:ss)
+      enddate:
+        type: string
+        description: End date (format YYYY-MM-DDThh:mm:ss)

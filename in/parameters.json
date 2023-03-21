@@ -5,5 +5,10 @@
         "max_lon": 5.5,
         "min_lat": 46.5,
         "max_lat": 47.5
+    },
+    "seldate": {
+        "infile": "/in/radklim_yw/20010103_radklim_yw.nc",
+        "startdate": "2001-01-03T08:30:00",
+        "enddate": "2001-01-03T23:00:00"
     }
 }
