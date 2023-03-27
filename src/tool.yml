@@ -64,3 +64,20 @@ tools:
       enddate:
         type: string
         description: End date (format YYYY-MM-DDThh:mm:ss)
+  selregion:
+    title: Select cells inside regions
+    description: |
+      Selects all grid cells with the center point inside the regions. 
+      The user has to give file in geojson format which contains the 
+      coordinates of the region which is to be selected from the netCDF
+      file.
+    version: 0.1
+    parameters:
+      infile: 
+        type: file
+        description: Input netCDF file which is sliced.
+      shape_geojson:
+        type: file
+        description: |
+          Path to geojson file containing the shape of the region to 
+          be selected.

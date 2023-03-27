@@ -1,3 +1,5 @@
+import json
+
 from cdo import *
 
 
@@ -66,8 +68,40 @@ def seldate_sellonlatbox(startdate: str, enddate: str, min_lon: float, max_lon: 
     
     """
     cdo.sellonlatbox(min_lon, max_lon, min_lat, max_lat, input = f"-seldate,{startdate},{enddate} {infile}", output = "/out/outfile.nc")
-    
 
-def selregion():
-    # input: geojson (?) -> get ASCII polygon
-    print('help')
+
+def selregion(shape_geojson, infile):
+    """
+    Select cells inside regions
+    Selects all grid cells with the center point inside the regions. 
+    The user has to give file in geojson format which contains the 
+    coordinates of the region which is to be selected from the netCDF
+    file.
+    If you only have a shape file of your region, you can use a tool
+    like ogr2ogr to convert it to a geojson file.
+    
+    Parameters
+    ----------
+    shape_geojson: str
+        Path to geojson file containing the shape of the region to 
+        be selected.
+    infile: str
+        Path to input file which is processed.
+
+    """
+    # read geojson shape
+    with open(shape_geojson, 'r') as j:
+        contents = json.loads(j.read())
+
+    # create ASCII file to store polygon coordinates
+    f = open('/out/regions.txt', 'w')
+
+    # write coordinates to ASCII file
+    # TODO: make this more flexible (keys)?
+    for lon, lat in contents.get('features')[0]['geometry']['coordinates'][0]:
+        f.writelines([str(lon), ' ', str(lat), '\n'])
+
+    import os
+    print(os.system('cdo --version'))
+    # execute cdo command
+    cdo.selregion('/out/regions.txt', input = infile, outfile = '/out/outfile.nc')

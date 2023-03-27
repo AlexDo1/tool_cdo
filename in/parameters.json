@@ -19,5 +19,9 @@
         "max_lat": 47.5,
         "startdate": "2001-01-03T08:30:00",
         "enddate": "2001-01-03T23:00:00"
+    },
+    "selregion": {
+        "infile": "/in/radklim_yw/20010103_radklim_yw.nc",
+        "shape_geojson": "/in/W22_gcs.geojson"
     }
 }

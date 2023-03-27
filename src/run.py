@@ -48,7 +48,19 @@ elif toolname == 'seldate_sellonlatbox':
 
     # run the command
     seldate_sellonlatbox(startdate, enddate, min_lon, max_lon, min_lat, max_lat, infile)
-    
+
+elif toolname == 'selregion':
+    # get the parameters
+    try:
+        infile = kwargs['infile']
+        shape_geojson = kwargs['shape_geojson']
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
+
+    # run the command
+    selregion(shape_geojson, infile)
+
 # In any other case, it was not clear which tool to run
 else:
     raise AttributeError(f"[{dt.now().isocalendar()}] Either no TOOL_RUN environment variable available, or '{toolname}' is not valid.\n")
