@@ -34,8 +34,21 @@ elif toolname == 'seldate':
         sys.exit(1)
 
     # run the command
-    seldate(startdate, enddate, infile)    
+    seldate(startdate, enddate, infile)
 
+elif toolname == 'seldate_sellonlatbox':
+    # get the parameters
+    try:
+        infile = kwargs['infile']
+        startdate, enddate = kwargs['startdate'], kwargs['enddate']
+        min_lon, max_lon, min_lat, max_lat = kwargs['min_lon'], kwargs['max_lon'], kwargs['min_lat'], kwargs['max_lat']
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
+
+    # run the command
+    seldate_sellonlatbox(startdate, enddate, min_lon, max_lon, min_lat, max_lat, infile)
+    
 # In any other case, it was not clear which tool to run
 else:
     raise AttributeError(f"[{dt.now().isocalendar()}] Either no TOOL_RUN environment variable available, or '{toolname}' is not valid.\n")

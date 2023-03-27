@@ -1,6 +1,6 @@
 tools:
   sellonlatbox:
-    title: Select grid cells from a netCDF file.
+    title: Select grid cells inside a lon/lat box
     description: |
       Selects grid cells inside a lon/lat box. The user must specify the longitude 
       and latitude of the edges of the box. Only those grid cells are considered 
@@ -23,13 +23,41 @@ tools:
         type: float
         description: Northern or southern latitude in degrees
   seldate:
-    title: Select dates
+    title: Select date range
     description: Selects all timesteps with a date in a user given range.
     version: 0.1
     parameters:
       infile:
         type: file
         description: Input netCDF file which is sliced.
+      startdate:
+        type: string
+        description: Start date (format YYYY-MM-DDThh:mm:ss)
+      enddate:
+        type: string
+        description: End date (format YYYY-MM-DDThh:mm:ss)
+  seldate_sellonlatbox:
+    title: Select date range and grid cells
+    description: |
+      Selects all timesteps with a date in a user given range and selects grid
+      cells inside a lon/lat box.
+    version: 0.1
+    parameters:
+      infile: 
+        type: file
+        description: Input netCDF file which is sliced.
+      min_lon:
+        type: float
+        description: Western longitude in degrees
+      max_lon:
+        type: float
+        description: Eastern longitude in degrees
+      min_lat:
+        type: float
+        description: Southern or northern latitude in degrees
+      max_lat:
+        type: float
+        description: Northern or southern latitude in degrees
       startdate:
         type: string
         description: Start date (format YYYY-MM-DDThh:mm:ss)
