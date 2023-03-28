@@ -81,3 +81,24 @@ tools:
         description: |
           Path to geojson file containing the shape of the region to 
           be selected.
+  mergetime:
+    title: Merge datasets sorted by date and time
+    description: |
+      Merges all timesteps of all input files sorted by date and time. 
+      All input files need to have the same structure with the same 
+      variables on different timesteps. After this operation every input 
+      timestep is in outfile and all timesteps are sorted by date and time.
+    version: 0.1
+    parameters:
+      nc_folder: 
+        type: file
+        description: |
+          Path to folder containing daily split netCDF files with the year, 
+          month and day as the start of the filename in the following 
+          format: %Y%m%d (e.g. 20010101_radolan_rw.nc).
+      startdate:
+        type: string
+        description: Start date (format YYYY-MM-DDThh:mm:ss)
+      enddate:
+        type: string
+        description: End date (format YYYY-MM-DDThh:mm:ss)

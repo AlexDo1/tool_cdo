@@ -61,6 +61,17 @@ elif toolname == 'selregion':
     # run the command
     selregion(shape_geojson, infile)
 
+elif toolname == 'mergetime':
+    # get the parameters
+    try:
+        nc_folder, startdate, enddate = kwargs['nc_folder'], kwargs['startdate'], kwargs['enddate']
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
+
+    # run the command
+    mergetime(nc_folder, startdate, enddate)
+
 # In any other case, it was not clear which tool to run
 else:
     raise AttributeError(f"[{dt.now().isocalendar()}] Either no TOOL_RUN environment variable available, or '{toolname}' is not valid.\n")

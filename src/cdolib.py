@@ -1,4 +1,6 @@
+import os
 import json
+from datetime import datetime
 
 from cdo import *
 
@@ -72,7 +74,7 @@ def seldate_sellonlatbox(startdate: str, enddate: str, min_lon: float, max_lon: 
 
 def selregion(shape_geojson, infile):
     """
-    Select cells inside regions
+    Select cells inside regions.
     Selects all grid cells with the center point inside the regions. 
     The user has to give file in geojson format which contains the 
     coordinates of the region which is to be selected from the netCDF
@@ -103,3 +105,48 @@ def selregion(shape_geojson, infile):
 
     # execute cdo command
     cdo.selregion('/tmp/regions.txt', input = infile, output = '/out/outfile.nc')
+
+
+def mergetime(nc_folder, startdate, enddate):
+    """
+    Merge datasets sorted by date and time.
+    Provide a folder with daily split netCDF files together with
+    a startdate and an enddate, files are selected by the date 
+    contained in the filename and are then merged.
+    
+    Parameters
+    ----------
+    nc_folder: str
+        Path to folder containing daily split netCDF files with
+        the year, month and day as the start of the filename in 
+        the following format: %Y%m%d (e.g. 20010101_radolan_rw.nc).
+    startdate: str
+        Start date (format YYYY-MM-DDThh:mm:ss).
+    enddate: str
+        End date (format YYYY-MM-DDThh:mm:ss).
+
+    """
+    # convert startdate and enddate strings to datetime objects
+    startdate = datetime.strptime(startdate, '%Y-%m-%dT%H:%M:%S').date()
+    enddate = datetime.strptime(enddate, '%Y-%m-%dT%H:%M:%S').date()
+
+    # get list of files in folder
+    files = os.listdir(nc_folder)
+
+    # get base directory name
+    dirname = os.path.basename(os.path.normpath(nc_folder))
+
+    # loop over files and select those with date within startdate and enddate
+    selected_files = []
+    for file in files:
+        if file.endswith('.nc'):
+            filedate_str = file[:8]
+            filedate = datetime.strptime(filedate_str, '%Y%m%d').date()
+            if startdate <= filedate <= enddate:
+                selected_files.append(f"/in/{dirname}/{file}")
+
+    # sort
+    selected_files = sorted(selected_files)
+
+    # run the command
+    cdo.mergetime(input = ' '.join(selected_files), output = '/out/outfile.nc')
