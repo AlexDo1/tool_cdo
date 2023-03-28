@@ -94,14 +94,12 @@ def selregion(shape_geojson, infile):
         contents = json.loads(j.read())
 
     # create ASCII file to store polygon coordinates
-    f = open('/out/regions.txt', 'w')
+    f = open('/tmp/regions.txt', 'w')
 
     # write coordinates to ASCII file
     # TODO: make this more flexible (keys)?
     for lon, lat in contents.get('features')[0]['geometry']['coordinates'][0]:
         f.writelines([str(lon), ' ', str(lat), '\n'])
 
-    import os
-    print(os.system('cdo --version'))
     # execute cdo command
-    cdo.selregion('/out/regions.txt', input = infile, outfile = '/out/outfile.nc')
+    cdo.selregion('/tmp/regions.txt', input = infile, output = '/out/outfile.nc')
