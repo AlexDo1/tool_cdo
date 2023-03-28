@@ -4,11 +4,13 @@ FROM python:3.10
 # install the toolbox runner tools
 RUN pip install json2args
 
-# install cdo binary
-RUN apt-get update && apt-get install -y cdo
+# install cdo binary, version 2.1.1
+RUN echo "deb http://deb.debian.org/debian/ bookworm main" > /etc/apt/sources.list.d/bookworm.list \
+    && apt-get update \
+    && apt-get install -y cdo=2.1.1-1
 
-# install cdo Python wrapper
-RUN pip install cdo
+# install cdo Python wrapper and dependencies
+RUN pip install cdo xarray netCDF4
 
 # create the tool input structure
 RUN mkdir /in
