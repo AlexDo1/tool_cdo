@@ -112,7 +112,9 @@ def mergetime(nc_folder, startdate, enddate):
     Merge datasets sorted by date and time.
     Provide a folder with daily split netCDF files together with
     a startdate and an enddate, files are selected by the date 
-    contained in the filename and are then merged.
+    contained in the filename and are then merged.  
+    After that, the cdo operator seldate is used to clip the 
+    netCDF to the temporal range given in startdate and enddate.
     
     Parameters
     ----------
@@ -127,8 +129,8 @@ def mergetime(nc_folder, startdate, enddate):
 
     """
     # convert startdate and enddate strings to datetime objects
-    startdate = datetime.strptime(startdate, '%Y-%m-%dT%H:%M:%S').date()
-    enddate = datetime.strptime(enddate, '%Y-%m-%dT%H:%M:%S').date()
+    startdate_dt = datetime.strptime(startdate, '%Y-%m-%dT%H:%M:%S').date()
+    enddate_dt = datetime.strptime(enddate, '%Y-%m-%dT%H:%M:%S').date()
 
     # get list of files in folder
     files = os.listdir(nc_folder)
@@ -142,11 +144,11 @@ def mergetime(nc_folder, startdate, enddate):
         if file.endswith('.nc'):
             filedate_str = file[:8]
             filedate = datetime.strptime(filedate_str, '%Y%m%d').date()
-            if startdate <= filedate <= enddate:
+            if startdate_dt <= filedate <= enddate_dt:
                 selected_files.append(f"/in/{dirname}/{file}")
 
-    # sort
+    # sort selected files
     selected_files = sorted(selected_files)
 
-    # run the command
-    cdo.mergetime(input = ' '.join(selected_files), output = '/out/outfile.nc')
+    # operator chain: merge selected files, select specified temporal range
+    cdo.seldate(startdate, enddate, input = "-mergetime " + ' '.join(selected_files), output = '/out/outfile.nc')
