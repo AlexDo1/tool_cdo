@@ -102,3 +102,32 @@ tools:
       enddate:
         type: string
         description: End date (format YYYY-MM-DDThh:mm:ss)
+  dwd_radar_to_timeseries:
+    title: Aggregate DWD radar products to single timeseries
+    description: |
+      Aggregate DWD radar products to single timeseries
+      + mergedate + selregion + seldate
+    version: 0.1
+    parameters:
+      nc_folder: 
+        type: file
+        description: |
+          Path to folder containing daily split netCDF files with the year, 
+          month and day as the start of the filename in the following 
+          format: %Y%m%d (e.g. 20010101_radolan_rw.nc).
+      shape_geojson:
+        type: file
+        description: |
+          Path to geojson file containing the shape of the region to 
+          be selected.
+      startdate:
+        type: string
+        description: Start date (format YYYY-MM-DDThh:mm:ss)
+      enddate:
+        type: string
+        description: End date (format YYYY-MM-DDThh:mm:ss)
+      mode:
+        type: enum
+        values:
+          - mean
+        description: How to aggregate the raster data into one timeseries.

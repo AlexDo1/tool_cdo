@@ -28,5 +28,12 @@
         "nc_folder": "/in/radklim_yw",
         "startdate": "2001-01-02T08:30:00",
         "enddate": "2001-01-04T23:00:00"
+    },
+    "dwd_radar_to_timeseries": {
+        "nc_folder": "/in/radklim_yw",
+        "shape_geojson": "/in/W22_gcs.geojson",
+        "startdate": "2001-01-02T08:30:00",
+        "enddate": "2001-01-04T23:00:00",
+        "mode": "mean"
     }
 }

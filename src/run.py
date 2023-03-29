@@ -3,6 +3,7 @@ from datetime import datetime as dt
 
 from cdo import *
 from cdolib import *
+from lib import *
 from json2args import get_parameter
 
 # parse parameters
@@ -71,6 +72,18 @@ elif toolname == 'mergetime':
 
     # run the command
     mergetime(nc_folder, startdate, enddate)
+
+elif toolname == 'dwd_radar_to_timeseries':
+    # get the parameters
+    try:
+        nc_folder, shape_geojson = kwargs['nc_folder'], kwargs['shape_geojson']
+        startdate, enddate, mode = kwargs['startdate'], kwargs['enddate'], kwargs['mode']
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
+
+    # run the tool
+    dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode)
 
 # In any other case, it was not clear which tool to run
 else:
