@@ -1,5 +1,8 @@
 from datetime import datetime
 
+import numpy as np
+import pandas as pd
+
 from cdo import *
 
 
@@ -27,11 +30,6 @@ def dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode):
         Data aggregation mode ['mean']
 
     """
-
-
-    cdo.debug = True
-
-
     ### select files in given temporal range from nc_folder
     # convert startdate and enddate strings to datetime objects
     startdate_dt = datetime.strptime(startdate, '%Y-%m-%dT%H:%M:%S').date()
@@ -71,13 +69,22 @@ def dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode):
     
     # operators: mergetime - selregion - seldate - aggregate: timmean
     if mode == 'mean':
-        timeseries = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files), returnArray = 'time, rainfall_amount')
-    print(timeseries)
-    #timeseries = temporal_mean.flatten()
+        ds = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files), 
+                                 returnXArray=['time', 'rainfall_amount'])
 
-    import matplotlib.pyplot as plt
-    plt.plot(timeseries)
-    plt.savefig("/out/timeseries.pdf")
+    # Extract the 'time' and 'rainfall_amount' variables from the xarray dataset
+    time = ds.time.values
+    rainfall_amount = ds.rainfall_amount.values
 
-    import numpy as np
-    np.savetxt('/out/timeseries.csv', timeseries, delimiter=',')
+    # Convert time array to minute precision by rounding down to nearest minute, add 30 seconds to make sure that rounding down is always correct
+    time = np.datetime64(time.astype('datetime64[m]') + np.timedelta64(30, 's'), unit='m')
+    
+    # Create a pandas dataframe with the two variables    
+    df = pd.DataFrame({'time': time, 'rainfall_amount': rainfall_amount.reshape(-1)})
+
+    # Write the dataframe to a CSV file
+    df.to_csv('/out/timeseries.csv', index=False)
+
+    # plot rainfall_amount against time and save as PDF
+    fig = df.plot.line(x='time', y='rainfall_amount').get_figure()
+    fig.savefig("/out/timeseries.pdf")
