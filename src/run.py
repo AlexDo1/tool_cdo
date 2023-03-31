@@ -73,17 +73,17 @@ elif toolname == 'mergetime':
     # run the command
     mergetime(nc_folder, startdate, enddate)
 
-elif toolname == 'dwd_radar_to_timeseries':
+elif toolname == 'aggregate_netcdf':
     # get the parameters
     try:
         nc_folder, shape_geojson = kwargs['nc_folder'], kwargs['shape_geojson']
-        startdate, enddate, mode = kwargs['startdate'], kwargs['enddate'], kwargs['mode']
+        variable, startdate, enddate, mode = kwargs['variable'], kwargs['startdate'], kwargs['enddate'], kwargs['mode']
     except Exception as e:
         print(str(e))
         sys.exit(1)
 
     # run the tool
-    dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode)
+    aggregate_netcdf(nc_folder, variable, shape_geojson, startdate, enddate, mode)
 
 # In any other case, it was not clear which tool to run
 else:

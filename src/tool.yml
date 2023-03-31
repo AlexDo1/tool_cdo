@@ -102,7 +102,7 @@ tools:
       enddate:
         type: string
         description: End date (format YYYY-MM-DDThh:mm:ss)
-  dwd_radar_to_timeseries:
+  aggregate_netcdf:
     title: Aggregate DWD radar products to single timeseries
     description: |
       Aggregate DWD radar products to single timeseries
@@ -115,6 +115,12 @@ tools:
           Path to folder containing daily split netCDF files with the year, 
           month and day as the start of the filename in the following 
           format: %Y%m%d (e.g. 20010101_radolan_rw.nc).
+      variable: 
+        type: str
+        description: |
+          The variable contained in the netCDF files that is aggregated.
+          Note, that the tstamp coordinate in the netCDF has to be named 
+          'time'.
       shape_geojson:
         type: file
         description: |

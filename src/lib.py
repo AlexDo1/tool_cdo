@@ -9,9 +9,13 @@ from cdo import *
 # initialize cdo
 cdo = Cdo()
 
-def dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode):
+
+def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdate: str, enddate: str, mode: str) -> None:
     """
-    
+    The function aggregate_netcdf processes netCDF files containing a 
+    specific variable within a given geographical region and temporal 
+    range. It aggregates the data using a specified mode and saves the 
+    output as a CSV file and a PDF plot.
 
     Parameters
     ----------
@@ -19,6 +23,9 @@ def dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode):
         Path to folder containing daily split netCDF files with
         the year, month and day as the start of the filename in 
         the following format: %Y%m%d (e.g. 20010101_radolan_rw.nc).
+    variable: str
+        The variable contained in the netCDF files that is aggregated.
+        Note, that the tstamp coordinate has to be named 'time'.
     shape_geojson: str
         Path to geojson file containing the shape of the region to 
         be selected.
@@ -57,34 +64,35 @@ def dwd_radar_to_timeseries(nc_folder, shape_geojson, startdate, enddate, mode):
     # read geojson shape
     with open(shape_geojson, 'r') as j:
         contents = json.loads(j.read())
-
-    # create ASCII file to store polygon coordinates
-    f = open('/tmp/regions.txt', 'w')
-
-    # write coordinates to ASCII file
-    # TODO: make this more flexible (keys)?
-    for lon, lat in contents.get('features')[0]['geometry']['coordinates'][0]:
-        f.writelines([str(lon), ' ', str(lat), '\n'])
-
     
-    # operators: mergetime - selregion - seldate - aggregate: timmean
-    if mode == 'mean':
-        ds = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files), 
-                                 returnXArray=['time', 'rainfall_amount'])
+    # create ASCII file to store polygon coordinates
+    # TODO: make this more flexible (keys)?
+    with open('/tmp/regions.txt', 'w') as f:
+        # write coordinates to ASCII file
+        for lon, lat in contents.get('features')[0]['geometry']['coordinates'][0]:
+            f.writelines([str(lon), ' ', str(lat), '\n'])
 
-    # Extract the 'time' and 'rainfall_amount' variables from the xarray dataset
+    # operators: mergetime - seldate - selregion - aggregate
+    if mode == 'mean':
+        ds = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files) +' --threads ' + str(len(selected_files)),
+                         options = f"--threads {len(selected_files)}", returnXArray=['time', variable])
+
+    # Extract the 'time' and variable from the xarray dataset
     time = ds.time.values
-    rainfall_amount = ds.rainfall_amount.values
+    variable_data = ds[variable].values
 
     # Convert time array to minute precision by rounding down to nearest minute, add 30 seconds to make sure that rounding down is always correct
-    time = np.datetime64(time.astype('datetime64[m]') + np.timedelta64(30, 's'), unit='m')
+    print(time)
+    print(type(time[0]))
+    time = np.datetime64(time.astype('datetime64[m]') + np.timedelta64(30, 's'))
     
     # Create a pandas dataframe with the two variables    
-    df = pd.DataFrame({'time': time, 'rainfall_amount': rainfall_amount.reshape(-1)})
+    df = pd.DataFrame({'time': time, variable: variable_data.reshape(-1)})
 
     # Write the dataframe to a CSV file
     df.to_csv('/out/timeseries.csv', index=False)
 
-    # plot rainfall_amount against time and save as PDF
-    fig = df.plot.line(x='time', y='rainfall_amount').get_figure()
+    # plot variable against time and save as PDF
+    fig = df.plot.line(x='time', y=variable_data).get_figure()
+    fig.set(xlabel="time", ylabel=variable)
     fig.savefig("/out/timeseries.pdf")
