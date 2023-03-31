@@ -12,8 +12,8 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main" > /etc/apt/sources.li
 # install cdo Python wrapper and dependencies
 RUN pip install cdo xarray netCDF4
 
-# install pandas and numpy
-RUN pip install numpy pandas
+# install matplotlib and pandas
+RUN pip install matplotlib pandas
 
 # create the tool input structure
 RUN mkdir /in

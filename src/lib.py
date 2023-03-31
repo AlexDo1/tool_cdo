@@ -74,17 +74,15 @@ def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdat
 
     # operators: mergetime - seldate - selregion - aggregate
     if mode == 'mean':
-        ds = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files) +' --threads ' + str(len(selected_files)),
-                         options = f"--threads {len(selected_files)}", returnXArray=['time', variable])
+        ds = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files),
+                         returnXArray=['time', variable])
 
     # Extract the 'time' and variable from the xarray dataset
     time = ds.time.values
     variable_data = ds[variable].values
 
     # Convert time array to minute precision by rounding down to nearest minute, add 30 seconds to make sure that rounding down is always correct
-    print(time)
-    print(type(time[0]))
-    time = np.datetime64(time.astype('datetime64[m]') + np.timedelta64(30, 's'))
+    time = pd.to_datetime(time).round('min').values.astype('datetime64[s]')
     
     # Create a pandas dataframe with the two variables    
     df = pd.DataFrame({'time': time, variable: variable_data.reshape(-1)})
@@ -93,6 +91,5 @@ def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdat
     df.to_csv('/out/timeseries.csv', index=False)
 
     # plot variable against time and save as PDF
-    fig = df.plot.line(x='time', y=variable_data).get_figure()
-    fig.set(xlabel="time", ylabel=variable)
+    fig = df.plot.line(x='time', y=variable, ylabel=variable).get_figure()
     fig.savefig("/out/timeseries.pdf")
