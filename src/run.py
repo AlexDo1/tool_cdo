@@ -78,6 +78,12 @@ elif toolname == 'aggregate_netcdf':
     try:
         nc_folder, shape_geojson = kwargs['nc_folder'], kwargs['shape_geojson']
         variable, startdate, enddate, mode = kwargs['variable'], kwargs['startdate'], kwargs['enddate'], kwargs['mode']
+        # if mode='percentile', the percentile value has to be specified in kwargs
+        if mode == 'percentile':
+            try:
+                percentile = kwargs['percentile']
+            except:
+                raise ValueError("With aggregation mode='percentile', the percentile value has to be given with parameter 'percentile'.")
     except Exception as e:
         print(str(e))
         sys.exit(1)

@@ -10,7 +10,7 @@ from cdo import *
 cdo = Cdo()
 
 
-def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdate: str, enddate: str, mode: str) -> None:
+def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdate: str, enddate: str, mode: str, percentile: float = None) -> None:
     """
     The function aggregate_netcdf processes netCDF files containing a 
     specific variable within a given geographical region and temporal 
@@ -34,7 +34,36 @@ def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdat
     enddate: str
         End date (format YYYY-MM-DDThh:mm:ss).
     mode: str
-        Data aggregation mode ['mean']
+        Data aggregation mode {'no_aggregation', 'mean', 'median', float}
+        
+        - no_aggregation: 
+            No aggregation is performed, instead, the netCDF files 
+            in nc_folder are merged and are cut to the given temporal 
+            and spatial range.
+        - mean:
+            Aggregate data by calculating the spatial mean value of
+            all cells.
+        - median:
+            Aggregate data by calculating the spatial median value of
+            all cells.
+        - percentiles:
+            To aggregate by percentile calculation, give the wanted
+            percentile as a string, e.g. '0.75'.
+            Aggregate data by calculating a given percentile of all 
+            cell values.
+        - min
+            Aggregate data by returning the minimum value of all 
+            cells.
+        - max
+            Aggregate data by returning the maximum value of all 
+            cells.
+        - percentile
+            Aggregate data by returning the percentile value of all 
+            cells.
+    percentile: float
+        Only specify when ``mode='percentile'``, the percentile to
+        calculate.
+        
 
     """
     ### select files in given temporal range from nc_folder
@@ -72,10 +101,30 @@ def aggregate_netcdf(nc_folder: str, variable: str, shape_geojson: str, startdat
         for lon, lat in contents.get('features')[0]['geometry']['coordinates'][0]:
             f.writelines([str(lon), ' ', str(lat), '\n'])
 
-    # operators: mergetime - seldate - selregion - aggregate
-    if mode == 'mean':
+    # operators: mergetime - seldate - selregion (- aggregate)
+    if mode == 'no_aggregation':
+        cdo.selregion('/tmp/regions.txt', input = ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files), output = '/out/outfile.nc')
+        return
+    
+    elif mode == 'mean':
         ds = cdo.fldmean(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files),
                          returnXArray=['time', variable])
+        
+    elif mode == 'median':
+        ds = cdo.fldmedian(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files),
+                           returnXArray=['time', variable])
+        
+    elif mode == 'min':
+        ds = cdo.fldmin(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files),
+                           returnXArray=['time', variable])
+        
+    elif mode == 'max':
+        ds = cdo.fldmax(input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files),
+                           returnXArray=['time', variable])
+    
+    elif mode == 'percentile':
+        ds = cdo.fldpctl(percentile, input = '-selregion,' + '/tmp/regions.txt' + ' -seldate,' + startdate + ',' + enddate + ' -mergetime ' + ' '.join(selected_files),
+                           returnXArray=['time', variable])
 
     # Extract the 'time' and variable from the xarray dataset
     time = ds.time.values

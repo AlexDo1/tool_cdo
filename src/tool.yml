@@ -91,7 +91,7 @@ tools:
     version: 0.1
     parameters:
       nc_folder: 
-        type: file
+        type: asset
         description: |
           Path to folder containing daily split netCDF files with the year, 
           month and day as the start of the filename in the following 
@@ -110,7 +110,7 @@ tools:
     version: 0.1
     parameters:
       nc_folder: 
-        type: file
+        type: asset
         description: |
           Path to folder containing daily split netCDF files with the year, 
           month and day as the start of the filename in the following 
@@ -135,5 +135,15 @@ tools:
       mode:
         type: enum
         values:
+          - no_aggregation
           - mean
+          - median
+          - min
+          - max
+          - percentile
         description: How to aggregate the raster data into one timeseries.
+      percentile:
+        type: float
+        description: |
+          Only used when mode='percentile', the percentile that is 
+          calculated.
