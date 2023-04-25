@@ -1,9 +1,7 @@
-# tool_template_python
+# CDO tool
 
-[![Docker Image CI](https://github.com/VForWaTer/tool_template_python/actions/workflows/docker-image.yml/badge.svg)](https://github.com/VForWaTer/tool_template_python/actions/workflows/docker-image.yml)
-[![DOI](https://zenodo.org/badge/558416591.svg)](https://zenodo.org/badge/latestdoi/558416591)
-
-This is the template for a generic containerized Python tool. This template can be used to generate new Github repositories from it.
+Tool to use the CDO (Climate Data Operators) software, which is a collection of operators for standard processing of climate and forecast model data in netCDF or GRIB format (https://code.mpimet.mpg.de/projects/cdo).  
+It follows the Tool Specification for reusable research software using Docker.
 
 ## How generic?
 
